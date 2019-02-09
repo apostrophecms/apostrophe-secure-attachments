@@ -41,6 +41,13 @@ use this module with the `s3` or `azure` storage backends.
 > "Why not?" Those services are basically static webservers for your media.
 That defeats the purpose of using this module.
 
+## Limitations
+
+Please note that limiting access to a URL doesn't prevent an authorized user from saving a
+file to their hard drive, then sharing that file directly. All this module does is prevent
+link sharing. However, it is still a useful tool to keep sensitive documents from being
+indexed accidentally after being inadvertently linked once on a public page, etc.
+
 ## Configuration
 
 Just turn it on in `app.js`:
@@ -56,6 +63,17 @@ module.exports = {
 };
 ```
 
+## Migrating your existing uploads
+
+1. Move `public/uploads` to `data/secure-uploads`.
+
+2. **Your `data` folder should already be a shared, persistent folder and if you are using our
+stagecoach deployment system, then it is.** But if you're not... make very sure this folder is
+shared and persistent between deployments. Otherwise, you'll lose your uploads every time
+you deploy.
+
+3. That's all.
+
 ## So wait... now how do I secure a file?
 
 Just click on "Images" or "Files" in your admin bar, browse to the 
@@ -69,7 +87,7 @@ both by user and by group.
 If you have added `attachment` schema fields directly to your own pages
 or pieces, just set the view permissions for those pages and pieces.
 For pages, this option is always available via "Page Settings." For
-pieces, it becomes available when you set `permissions: true` as
+pieces, it becomes available in the editor if you set `permissionsFields: true` as
 an option to your pieces module, like this:
 
 ```javascript
@@ -79,7 +97,7 @@ module.exports = {
   extend: 'apostrophe-pieces',
   name: 'product',
   // Enables view permissions on a per-piece basis
-  permissions: true,
+  permissionsFields: true,
   addFields: [
     {
       type: 'attachment',

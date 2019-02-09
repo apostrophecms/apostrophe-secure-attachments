@@ -1,0 +1,29 @@
+{
+  "name": "apostrophe-secure-attachments",
+  "version": "2.0.0",
+  "description": "Limit direct URL access to uploaded attachments, such as PDFs, to those who have appropriate permissions.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apostrophecms/apostrophe-secure-attachments.git"
+  },
+  "keywords": [
+    "apostrophecms",
+    "apostrophe",
+    "cms",
+    "cms",
+    "apostrophe"
+  ],
+  "author": "P'unk Avenue LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apostrophecms/apostrophe-secure-attachments/issues"
+  },
+  "homepage": "https://github.com/apostrophecms/apostrophe-secure-attachments#readme"
+}

@@ -7,26 +7,22 @@ module.exports = {
     ]
   },
   improve: 'apostrophe-attachments',
+  afterConstruct: function(self) {
+    self.addSecureUploadsRoute();
+  },
   beforeConstruct: function(self, options) {
     options.uploadfs = options.uploadfs || {};
-    options.uploadfs.uploadsPath = '/data/secured';
+    options.uploadfs.uploadsPath = options.apos.rootDir + '/data/secure-uploads';
     const base = (options.apos.baseUrl || '') + options.apos.prefix;
-    options.uploadfs.uploadsUrl = base + '/modules/apostrophe-attachments/view';
+    options.uploadfs.uploadsUrl = base + '/secure-uploads';
   },
   construct: function(self, options) {
-    const superUrl = self.url;
-    self.url = function(attachment, options) {
-      if (options.uploadfsPath) {
-        return superUrl(attachment, options);
-      }
-      options = Object.assign({}, options, { uploadfsPath: true });
-      const path = superUrl(attachment, options);
-      return self.action + '/view/' + path;
-    };
 
-    self.route('get', 'view/*', self.secureAttachmentMiddleware, function(req, res) {
-      return self.servePath(req, res);
-    });
+    self.addSecureUploadsRoute = function() {
+      self.apos.app.get('/secure-uploads/*', self.secureAttachmentMiddleware, function(req, res) {
+        return self.servePath(req, res);
+      });
+    };
 
     self.secureAttachmentMiddleware = async function(req, res, next) {
       const path = req.params[0];
@@ -47,18 +43,27 @@ module.exports = {
         }
         // the _id is everything up to the first -
         const _id = path.substring(0, hyphenAt);
-        const attachment = await self.db.findOne({ _id: _id }).toObject();
+        const attachment = await self.db.findOne({ _id: _id });
         if (!attachment) {
           throw 'notfound';
         }
         if (attachment.utilized) {
+        
           // Once an attachment is attached to its first doc, the permissions
-          // of its docs become its permissions - we have to be able to view
-          // at least one of them as this user
-          if (!attachment.docIds.length) {
+          // of its docs become its permissions. The test is: we have to be able to view
+          // at least one of those docs as this user.
+          //
+          // Docs in the trash can pass this test for someone allowed to edit them,
+          // but in practice only come through if it happens to be the "allowed in
+          // trash" size used for media library preview; the rest
+          // will have permissions set to 000 or the disabledFileKey renaming pattern
+          // in effect, so things behave just as they would without this module.
+          
+          const ids = (attachment.docIds || []).concat(attachment.trashDocIds || []);
+          if (!ids.length) {
             throw 'forbidden';
           }
-          const doc = self.apos.docs.find(req, { _id: { $in: attachment.docIds } }).toObject();
+          const doc = await self.apos.docs.find(req, { _id: { $in: ids } }).trash(null).published(null).toObject();
           if (!doc) {
             // We are not cool enough to view any of the docs that
             // contain this attachment (there can be more than one
@@ -93,10 +98,10 @@ module.exports = {
     // to the bucket, etc.
 
     self.servePath = function(req, res) {
-      const path = self.options.uploadfs.uploadsPath + '/' + req.params[0];
+      let path = self.options.uploadfs.uploadsPath + '/' + req.params[0];
       // No sneakiness
       path = path.replace(/\.\./g, ''); 
-      return res.sendFile(require('path').resolve(self.options.uploadfs.uploadsPath + path));
+      return res.sendFile(require('path').resolve(path));
     };
 
   }
