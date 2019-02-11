@@ -48,7 +48,7 @@ module.exports = {
           throw 'notfound';
         }
         if (attachment.utilized) {
-        
+
           // Once an attachment is attached to its first doc, the permissions
           // of its docs become its permissions. The test is: we have to be able to view
           // at least one of those docs as this user.
@@ -58,7 +58,7 @@ module.exports = {
           // trash" size used for media library preview; the rest
           // will have permissions set to 000 or the disabledFileKey renaming pattern
           // in effect, so things behave just as they would without this module.
-          
+
           const ids = (attachment.docIds || []).concat(attachment.trashDocIds || []);
           if (!ids.length) {
             throw 'forbidden';
@@ -89,7 +89,7 @@ module.exports = {
       }
     };
 
-    // Send the file at the uploadfs path specified by req.params[0] 
+    // Send the file at the uploadfs path specified by req.params[0]
     // to the browser. Assumes local uploadfs backend. Streaming
     // securely from other backends would be expensive and slow.
     // Perhaps it could be implemented with local caching, but we
@@ -100,10 +100,9 @@ module.exports = {
     self.servePath = function(req, res) {
       let path = self.options.uploadfs.uploadsPath + '/' + req.params[0];
       // No sneakiness
-      path = path.replace(/\.\./g, ''); 
+      path = path.replace(/\.\./g, '');
       return res.sendFile(require('path').resolve(path));
     };
 
   }
 };
-
