@@ -75,14 +75,10 @@ module.exports = {
         return next();
       } catch (e) {
         if (e === 'notfound') {
-          // TODO standard apostrophe 404 page would be nicer
           return res.status(404).send('not found');
         } if (e === 'forbidden') {
-          // TODO Compatibility with apostrophe-second-chance-login would
-          // be better here
           return res.status(403).send('forbidden');
         } else {
-          // TODO standard apostrophe 500 page would be better
           self.apos.utils.error(e);
           return res.status(500).send('error');
         }
