@@ -28,6 +28,8 @@ site that doesn't really need it.
 
 ## Installation
 
+NOTE: node 8 is required for this module.
+
 ```
 npm install apostrophe-secure-attachments
 ```
