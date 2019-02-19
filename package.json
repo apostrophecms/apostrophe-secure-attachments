@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-secure-attachments",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Limit direct URL access to uploaded attachments, such as PDFs, to those who have appropriate permissions.",
   "main": "index.js",
   "directories": {

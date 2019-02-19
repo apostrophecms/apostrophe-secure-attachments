@@ -76,6 +76,9 @@ you deploy.
 
 3. That's all.
 
+> Legacy URLs like `/uploads/attachments/yyy-some-file.pdf` will be
+automatically redirected to `/secure-uploads/attachments/yyy-some-file.pdf`.
+
 ## So wait... now how do I secure a file?
 
 Just click on "Images" or "Files" in your admin bar, browse to the 

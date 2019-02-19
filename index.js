@@ -8,6 +8,7 @@ module.exports = {
   },
   improve: 'apostrophe-attachments',
   afterConstruct: function(self) {
+    self.addRedirectUploadsRoute();
     self.addSecureUploadsRoute();
   },
   beforeConstruct: function(self, options) {
@@ -18,6 +19,12 @@ module.exports = {
   },
   construct: function(self, options) {
 
+    self.addRedirectUploadsRoute = function() {
+      self.apos.app.get('/uploads/*', function(req, res) {
+        return res.redirect('/secure-uploads/' + req.params[0]);
+      });
+    };
+ 
     self.addSecureUploadsRoute = function() {
       self.apos.app.get('/secure-uploads/*', self.secureAttachmentMiddleware, function(req, res) {
         return self.servePath(req, res);
@@ -95,7 +102,7 @@ module.exports = {
 
     self.servePath = function(req, res) {
       let path = self.options.uploadfs.uploadsPath + '/' + req.params[0];
-      // No sneakiness
+      // Do not allow relative paths to escape the intended folder
       path = path.replace(/\.\./g, '');
       return res.sendFile(require('path').resolve(path));
     };
