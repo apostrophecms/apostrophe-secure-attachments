@@ -5,7 +5,6 @@
 const contentTypes = require('uploadfs/lib/storage/contentTypes.js');
 const stream = require('stream');
 const util = require('util');
-const pipeline = util.promisify(stream.pipeline);
 
 module.exports = {
   moogBundle: {
@@ -104,8 +103,12 @@ module.exports = {
         const input = self.uploadfs.streamOut(`/${path}`);
         let progress = false;
         try {
+          let n = 0;
           for await (const buffer of input) {
-            res.setHeader('content-type', contentType);
+            n++;
+            if (n === 1) {
+              res.setHeader('content-type', contentType);
+            }
             res.write(buffer);
             progress = true;
           }
@@ -118,7 +121,7 @@ module.exports = {
               res.status(500).setHeader('content-type', 'text/plain').send('Unknown error from S3\n');
             }
           } else {
-            // The pipeline mechanism will shut it down for us
+            // Too late to change the status code, send a new message, etc.
           }
         }
       } catch (e) {
