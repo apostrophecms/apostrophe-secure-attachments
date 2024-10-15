@@ -112,6 +112,7 @@ module.exports = {
             res.write(buffer);
             progress = true;
           }
+          res.end();
         } catch (e) {
           if (!progress) {
             if (e.statusCode) {

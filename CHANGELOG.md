@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0-alpha.4
+## 2.1.0-alpha.5
 
 Support for S3, and any other `uploadfs` storage backend that has been modernized with a `streamOut` implementation. This allows the module to be used in a scaled application with multiple servers. Not compatible with `APOS_UPLOADFS_ASSETS=1`.
 
