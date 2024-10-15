@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-secure-attachments",
-  "version": "2.0.1",
+  "version": "2.1.0-alpha.1",
   "description": "Limit direct URL access to uploaded attachments, such as PDFs, to those who have appropriate permissions.",
   "main": "index.js",
   "directories": {
@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/apostrophecms/apostrophe-secure-attachments/issues"
   },
-  "homepage": "https://github.com/apostrophecms/apostrophe-secure-attachments#readme"
+  "homepage": "https://github.com/apostrophecms/apostrophe-secure-attachments#readme",
+  "dependencies": {
+    "uploadfs": "^1.23.0"
+  }
 }
