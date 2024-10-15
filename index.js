@@ -3,6 +3,9 @@
 // actually use for everything else belongs to apostrophe
 
 const contentTypes = require('uploadfs/lib/storage/contentTypes.js');
+const stream = require('stream');
+const util = require('util');
+const pipeline = util.promisify(stream.pipeline);
 
 module.exports = {
   moogBundle: {
@@ -20,14 +23,19 @@ module.exports = {
   beforeConstruct: function(self, options) {
     options.uploadfs = options.uploadfs || {};
 
+    // Change the URL from which content is served to one over which
+    // we have control (see route below)
+    const base = (options.apos.baseUrl || '') + options.apos.prefix;
+    options.uploadfs.cdn = {
+      enabled: true,
+      url: `${base}/secure-uploads`
+    };
     // For S3
     options.uploadfs.bucketObjectACL = 'private';
     options.uploadfs.disabledBucketObjectACL = 'private';
-
+ 
     // For local
     options.uploadfs.uploadsPath = options.apos.rootDir + '/data/secure-uploads';
-    const base = (options.apos.baseUrl || '') + options.apos.prefix;
-    options.uploadfs.uploadsUrl = base + '/secure-uploads';
   },
   construct: function(self, options) {
 
@@ -93,9 +101,26 @@ module.exports = {
         // OK, stream it, take care not to allow escape from the folder
         path = path.replace(/\.\.\//g, '');
         const contentType = contentTypes[extension] || 'application/octet-stream';
-        res.setHeader('content-type', contentType);
         const input = self.uploadfs.streamOut(`/${path}`);
-        input.pipe(res);
+        let progress = false;
+        try {
+          for await (const buffer of input) {
+            res.setHeader('content-type', contentType);
+            res.write(buffer);
+            progress = true;
+          }
+        } catch (e) {
+          if (!progress) {
+            if (e.statusCode) {
+              // Without the newline 404 crops to 40
+              res.status(e.statusCode).setHeader('content-type', 'text/plain').send(`Error from S3: ${e.status}\n`);
+            } else {
+              res.status(500).setHeader('content-type', 'text/plain').send('Unknown error from S3\n');
+            }
+          } else {
+            // The pipeline mechanism will shut it down for us
+          }
+        }
       } catch (e) {
         if (e === 'notfound') {
           return res.status(404).send('not found');
