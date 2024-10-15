@@ -113,7 +113,7 @@ module.exports = {
           if (!progress) {
             if (e.statusCode) {
               // Without the newline 404 crops to 40
-              res.status(e.statusCode).setHeader('content-type', 'text/plain').send(`Error from S3: ${e.status}\n`);
+              res.status(e.statusCode).setHeader('content-type', 'text/plain').send(`Error from S3: ${e.statusCode}\n`);
             } else {
               res.status(500).setHeader('content-type', 'text/plain').send('Unknown error from S3\n');
             }
