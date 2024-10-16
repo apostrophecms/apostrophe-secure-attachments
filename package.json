@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/apostrophecms/apostrophe-secure-attachments#readme",
   "dependencies": {
-    "uploadfs": "^1.23.0"
+    "uploadfs": "^1.24.1"
   }
 }
