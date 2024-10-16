@@ -26,9 +26,17 @@ involved in serving each one. It's not terrible, but there's an impact.
 So just bear that in mind, and don't use this module on a super-high-traffic
 site that doesn't really need it.
 
+## Use with S3
+
+This module supports configurations where Apostrophe's media is served from S3 rather than local files, with the following contraints:
+
+* You must not use `APOS_UPLOADFS_ASSETS=1`. Apostrophe's static assets will still be served, they just won't be copied to S3. They will be served via Apostrophe and/or nginx `try_files` rather than the S3 bucket.
+* As of this writing, only S3 is currently supported for this, not Azure or Google Cloud Storage. Interested parties may wish to contribute implementations of the `streamOut` method to those storage adapters in [uploadfs](https://github.com/apostrophecms/uploadfs).
+* Streaming media from S3 in this way imposes a more significant performance penalty than streaming from local files. Apostrophe must first check the attachment permissions, then open a connection to S3, then stream the data to itself and pipe it onwards to the browser.
+
 ## Installation
 
-NOTE: node 8 is required for this module.
+NOTE: node 18 or better is required for this module.
 
 ```
 npm install apostrophe-secure-attachments
